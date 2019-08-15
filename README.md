@@ -6,13 +6,13 @@
 ![Swift5](https://img.shields.io/badge/swift-5-blue.svg)
 ![macOS](https://img.shields.io/badge/os-macOS-green.svg?style=flat)
 ![tuxOS](https://img.shields.io/badge/os-tuxOS-green.svg?style=flat)
-![Travis](https://travis-ci.org/ZeeQL/ZeeQL3PG.svg?branch=develop)
+![Travis](https://travis-ci.org/ZeeQL/ZeeQL3PCK.svg?branch=develop)
 
 This library contains a ZeeQL database adaptor for
 [PostgreSQL](https://www.postgresql.org)
 based on the
 [PostgresClientKit](https://github.com/codewinsdotcom/PostgresClientKit.git)
-package.
+package. It requires Swift 5.0+.
 
 Note: If your Swift code is running within Apache via
 [mod_swift](http://mod-swift.org)
