@@ -1,0 +1,155 @@
+//
+//  PCKAttributeValue.swift
+//  ZeeQL3PCK
+//
+//  Created by Helge Heß on 15.08.19.
+//  Copyright © 2019 Helge Heß. All rights reserved.
+//
+
+import struct   Foundation.Date
+import struct   Foundation.Decimal
+import struct   Foundation.URL
+import struct   PostgresClientKit.PostgresValue
+import protocol PostgresClientKit.PostgresValueConvertible
+import protocol ZeeQL.AttributeValue
+import class    ZeeQL.SingleIntKeyGlobalID
+
+extension SingleIntKeyGlobalID: PostgresValueConvertible {
+  public var postgresValue: PostgresValue { return value.postgresValue }
+}
+
+protocol PCKAttributeValue: AttributeValue {
+  
+  static func pckValue(_ value: PostgresValue) throws -> Any?
+  
+}
+
+extension Optional: PCKAttributeValue where Wrapped : PCKAttributeValue {
+  static func pckValue(_ value: PostgresValue) throws -> Any? {
+    if value.isNull { return Optional<Wrapped>.none }
+    return try Wrapped.pckValue(value)
+  }
+}
+
+fileprivate extension PostgresValue {
+  @inline(__always) func zzVerifyNotNil() throws {
+    guard !isNull else { throw PostgreSQLAdaptorChannel.Error.unexpectedNull }
+  }
+}
+
+extension String: PCKAttributeValue {
+  static func pckValue(_ value: PostgresValue) throws -> Any? {
+    try value.zzVerifyNotNil()
+    return try value.string()
+  }
+}
+
+// FIXME: Those should just parse the raw value ...
+
+extension PostgresValue {
+  func int<V: FixedWidthInteger>(ofType type: V.Type) throws -> Int {
+    try zzVerifyNotNil()
+    let v = try int()
+    guard v >= type.min && v <= type.max else {
+      throw PostgreSQLAdaptorChannel.Error.conversionError(type, v)
+    }
+    return v
+  }
+}
+
+
+extension Int: PCKAttributeValue {
+  static func pckValue(_ value: PostgresValue) throws -> Any? {
+    try value.zzVerifyNotNil()
+    return try value.int()
+  }
+}
+extension Int8: PCKAttributeValue {
+  static func pckValue(_ value: PostgresValue) throws -> Any? {
+    return Self(try value.int(ofType: Int8.self))
+  }
+}
+extension Int16: PCKAttributeValue {
+  static func pckValue(_ value: PostgresValue) throws -> Any? {
+    return Self(try value.int(ofType: Int16.self))
+  }
+}
+extension Int32: PCKAttributeValue {
+  static func pckValue(_ value: PostgresValue) throws -> Any? {
+    return Self(try value.int(ofType: Int32.self))
+  }
+}
+extension Int64: PCKAttributeValue {
+  static func pckValue(_ value: PostgresValue) throws -> Any? {
+    return Self(try value.int(ofType: Int64.self))
+  }
+}
+extension UInt8: PCKAttributeValue {
+  static func pckValue(_ value: PostgresValue) throws -> Any? {
+    return Self(try value.int(ofType: UInt8.self))
+  }
+}
+extension UInt16: PCKAttributeValue {
+  static func pckValue(_ value: PostgresValue) throws -> Any? {
+    return Self(try value.int(ofType: UInt16.self))
+  }
+}
+extension UInt32: PCKAttributeValue {
+  static func pckValue(_ value: PostgresValue) throws -> Any? {
+    return Self(try value.int(ofType: UInt32.self))
+  }
+}
+extension UInt64: PCKAttributeValue {
+  static func pckValue(_ value: PostgresValue) throws -> Any? {
+    try value.zzVerifyNotNil()
+    // FIXME: can break for valid value
+    return Self(try value.int(ofType: UInt64.self))
+  }
+}
+
+extension Float: PCKAttributeValue {
+  static func pckValue(_ value: PostgresValue) throws -> Any? {
+    try value.zzVerifyNotNil()
+    guard let rv = value.rawValue else { return nil }
+    guard let v  = Float(rv) else {
+      throw PostgreSQLAdaptorChannel.Error.conversionError(Float.self, rv)
+    }
+    return v
+  }
+}
+extension Double: PCKAttributeValue {
+  static func pckValue(_ value: PostgresValue) throws -> Any? {
+    try value.zzVerifyNotNil()
+    return try value.double()
+  }
+}
+extension Bool: PCKAttributeValue {
+  static func pckValue(_ value: PostgresValue) throws -> Any? {
+    try value.zzVerifyNotNil()
+    return try value.bool()
+  }
+}
+
+extension Decimal: PCKAttributeValue {
+  static func pckValue(_ value: PostgresValue) throws -> Any? {
+    try value.zzVerifyNotNil()
+    return try value.decimal()
+  }
+}
+
+extension Date: PCKAttributeValue {
+  static func pckValue(_ value: PostgresValue) throws -> Any? {
+    try value.zzVerifyNotNil()
+    return try value.timestampWithTimeZone().date
+  }
+}
+extension URL: PCKAttributeValue {
+  static func pckValue(_ value: PostgresValue) throws -> Any? {
+    try value.zzVerifyNotNil()
+    let s = try value.string()
+    guard let v = URL(string: s) else {
+      throw PostgreSQLAdaptorChannel.Error.conversionError(URL.self, s)
+    }
+    return v
+  }
+}

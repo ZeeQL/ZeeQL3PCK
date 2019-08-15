@@ -1,0 +1,512 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 52;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		E894B1552304684F00AB16BB /* PostgreSQLModelFetch.swift in Sources */ = {isa = PBXBuildFile; fileRef = E894B1502304684F00AB16BB /* PostgreSQLModelFetch.swift */; };
+		E894B1562304684F00AB16BB /* PostgreSQLExpression.swift in Sources */ = {isa = PBXBuildFile; fileRef = E894B1512304684F00AB16BB /* PostgreSQLExpression.swift */; };
+		E894B1572304684F00AB16BB /* PostgreSQLAdaptorChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E894B1522304684F00AB16BB /* PostgreSQLAdaptorChannel.swift */; };
+		E894B1582304684F00AB16BB /* PostgreSQLAdaptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = E894B1532304684F00AB16BB /* PostgreSQLAdaptor.swift */; };
+		E894B1592304684F00AB16BB /* PostgreSQLOIDs.swift in Sources */ = {isa = PBXBuildFile; fileRef = E894B1542304684F00AB16BB /* PostgreSQLOIDs.swift */; };
+		E894B160230469F000AB16BB /* libZeeQL.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E894B15F230469F000AB16BB /* libZeeQL.dylib */; };
+		E894B16323046A6200AB16BB /* PostgresClientKit in Frameworks */ = {isa = PBXBuildFile; productRef = E894B16223046A6200AB16BB /* PostgresClientKit */; };
+		E894B16623046A7100AB16BB /* ZeeQL in Frameworks */ = {isa = PBXBuildFile; productRef = E894B16523046A7100AB16BB /* ZeeQL */; };
+		E894B16E2304700D00AB16BB /* TestZeeQL3PCK.swift in Sources */ = {isa = PBXBuildFile; fileRef = E894B16D2304700D00AB16BB /* TestZeeQL3PCK.swift */; };
+		E894B1702304700D00AB16BB /* libZeeQL3PCK.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E894B1472304667E00AB16BB /* libZeeQL3PCK.a */; };
+		E894B1772305A14200AB16BB /* PCKAttributeValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = E894B1762305A14200AB16BB /* PCKAttributeValue.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		E894B1712304700D00AB16BB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E894B13F2304667E00AB16BB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E894B1462304667E00AB16BB;
+			remoteInfo = ZeeQL3PCK;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		E894B1472304667E00AB16BB /* libZeeQL3PCK.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libZeeQL3PCK.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		E894B1502304684F00AB16BB /* PostgreSQLModelFetch.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostgreSQLModelFetch.swift; sourceTree = "<group>"; };
+		E894B1512304684F00AB16BB /* PostgreSQLExpression.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostgreSQLExpression.swift; sourceTree = "<group>"; };
+		E894B1522304684F00AB16BB /* PostgreSQLAdaptorChannel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostgreSQLAdaptorChannel.swift; sourceTree = "<group>"; };
+		E894B1532304684F00AB16BB /* PostgreSQLAdaptor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostgreSQLAdaptor.swift; sourceTree = "<group>"; };
+		E894B1542304684F00AB16BB /* PostgreSQLOIDs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostgreSQLOIDs.swift; sourceTree = "<group>"; };
+		E894B15B2304687200AB16BB /* SwiftShared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = SwiftShared.xcconfig; sourceTree = "<group>"; };
+		E894B15C2304687200AB16BB /* Base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Base.xcconfig; sourceTree = "<group>"; };
+		E894B15D230468F400AB16BB /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
+		E894B15F230469F000AB16BB /* libZeeQL.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; path = libZeeQL.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		E894B16B2304700D00AB16BB /* TestZeeQL3PCK.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TestZeeQL3PCK.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E894B16D2304700D00AB16BB /* TestZeeQL3PCK.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestZeeQL3PCK.swift; sourceTree = "<group>"; };
+		E894B16F2304700D00AB16BB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E894B1762305A14200AB16BB /* PCKAttributeValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCKAttributeValue.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		E894B1452304667E00AB16BB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E894B16623046A7100AB16BB /* ZeeQL in Frameworks */,
+				E894B160230469F000AB16BB /* libZeeQL.dylib in Frameworks */,
+				E894B16323046A6200AB16BB /* PostgresClientKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E894B1682304700D00AB16BB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E894B1702304700D00AB16BB /* libZeeQL3PCK.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		E894B13E2304667E00AB16BB = {
+			isa = PBXGroup;
+			children = (
+				E894B15D230468F400AB16BB /* Package.swift */,
+				E894B14E2304684F00AB16BB /* Sources */,
+				E894B15A2304687200AB16BB /* xcconfig */,
+				E894B16C2304700D00AB16BB /* TestZeeQL3PCK */,
+				E894B1482304667E00AB16BB /* Products */,
+				E894B15E230469F000AB16BB /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		E894B1482304667E00AB16BB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				E894B1472304667E00AB16BB /* libZeeQL3PCK.a */,
+				E894B16B2304700D00AB16BB /* TestZeeQL3PCK.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		E894B14E2304684F00AB16BB /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				E894B14F2304684F00AB16BB /* PostgreSQLAdaptor */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		E894B14F2304684F00AB16BB /* PostgreSQLAdaptor */ = {
+			isa = PBXGroup;
+			children = (
+				E894B1532304684F00AB16BB /* PostgreSQLAdaptor.swift */,
+				E894B1522304684F00AB16BB /* PostgreSQLAdaptorChannel.swift */,
+				E894B1502304684F00AB16BB /* PostgreSQLModelFetch.swift */,
+				E894B1512304684F00AB16BB /* PostgreSQLExpression.swift */,
+				E894B1542304684F00AB16BB /* PostgreSQLOIDs.swift */,
+				E894B1762305A14200AB16BB /* PCKAttributeValue.swift */,
+			);
+			path = PostgreSQLAdaptor;
+			sourceTree = "<group>";
+		};
+		E894B15A2304687200AB16BB /* xcconfig */ = {
+			isa = PBXGroup;
+			children = (
+				E894B15B2304687200AB16BB /* SwiftShared.xcconfig */,
+				E894B15C2304687200AB16BB /* Base.xcconfig */,
+			);
+			path = xcconfig;
+			sourceTree = "<group>";
+		};
+		E894B15E230469F000AB16BB /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				E894B15F230469F000AB16BB /* libZeeQL.dylib */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		E894B16C2304700D00AB16BB /* TestZeeQL3PCK */ = {
+			isa = PBXGroup;
+			children = (
+				E894B16D2304700D00AB16BB /* TestZeeQL3PCK.swift */,
+				E894B16F2304700D00AB16BB /* Info.plist */,
+			);
+			path = TestZeeQL3PCK;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		E894B1432304667E00AB16BB /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		E894B1462304667E00AB16BB /* ZeeQL3PCK */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E894B14B2304667E00AB16BB /* Build configuration list for PBXNativeTarget "ZeeQL3PCK" */;
+			buildPhases = (
+				E894B1432304667E00AB16BB /* Headers */,
+				E894B1442304667E00AB16BB /* Sources */,
+				E894B1452304667E00AB16BB /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ZeeQL3PCK;
+			packageProductDependencies = (
+				E894B16223046A6200AB16BB /* PostgresClientKit */,
+				E894B16523046A7100AB16BB /* ZeeQL */,
+			);
+			productName = ZeeQL3PCK;
+			productReference = E894B1472304667E00AB16BB /* libZeeQL3PCK.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		E894B16A2304700D00AB16BB /* TestZeeQL3PCK */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E894B1752304700D00AB16BB /* Build configuration list for PBXNativeTarget "TestZeeQL3PCK" */;
+			buildPhases = (
+				E894B1672304700D00AB16BB /* Sources */,
+				E894B1682304700D00AB16BB /* Frameworks */,
+				E894B1692304700D00AB16BB /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E894B1722304700D00AB16BB /* PBXTargetDependency */,
+			);
+			name = TestZeeQL3PCK;
+			productName = TestZeeQL3PCK;
+			productReference = E894B16B2304700D00AB16BB /* TestZeeQL3PCK.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		E894B13F2304667E00AB16BB /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1100;
+				LastUpgradeCheck = 1100;
+				ORGANIZATIONNAME = "Helge Heß";
+				TargetAttributes = {
+					E894B1462304667E00AB16BB = {
+						CreatedOnToolsVersion = 11.0;
+					};
+					E894B16A2304700D00AB16BB = {
+						CreatedOnToolsVersion = 11.0;
+					};
+				};
+			};
+			buildConfigurationList = E894B1422304667E00AB16BB /* Build configuration list for PBXProject "ZeeQL3PCK" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = E894B13E2304667E00AB16BB;
+			packageReferences = (
+				E894B16123046A6200AB16BB /* XCRemoteSwiftPackageReference "PostgresClientKit" */,
+				E894B16423046A7100AB16BB /* XCRemoteSwiftPackageReference "ZeeQL3" */,
+			);
+			productRefGroup = E894B1482304667E00AB16BB /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				E894B1462304667E00AB16BB /* ZeeQL3PCK */,
+				E894B16A2304700D00AB16BB /* TestZeeQL3PCK */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		E894B1692304700D00AB16BB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		E894B1442304667E00AB16BB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E894B1552304684F00AB16BB /* PostgreSQLModelFetch.swift in Sources */,
+				E894B1772305A14200AB16BB /* PCKAttributeValue.swift in Sources */,
+				E894B1592304684F00AB16BB /* PostgreSQLOIDs.swift in Sources */,
+				E894B1582304684F00AB16BB /* PostgreSQLAdaptor.swift in Sources */,
+				E894B1562304684F00AB16BB /* PostgreSQLExpression.swift in Sources */,
+				E894B1572304684F00AB16BB /* PostgreSQLAdaptorChannel.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E894B1672304700D00AB16BB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E894B16E2304700D00AB16BB /* TestZeeQL3PCK.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		E894B1722304700D00AB16BB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E894B1462304667E00AB16BB /* ZeeQL3PCK */;
+			targetProxy = E894B1712304700D00AB16BB /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		E894B1492304667E00AB16BB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = E894B15C2304687200AB16BB /* Base.xcconfig */;
+			buildSettings = {
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_TESTABILITY = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		E894B14A2304667E00AB16BB /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = E894B15C2304687200AB16BB /* Base.xcconfig */;
+			buildSettings = {
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		E894B14C2304667E00AB16BB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = E894B15B2304687200AB16BB /* SwiftShared.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		E894B14D2304667E00AB16BB /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = E894B15B2304687200AB16BB /* SwiftShared.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				EXECUTABLE_PREFIX = lib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		E894B1732304700D00AB16BB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = TestZeeQL3PCK/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				PRODUCT_BUNDLE_IDENTIFIER = de.zeezide.zeeql.adaptors.pck.TestZeeQL3PCK;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		E894B1742304700D00AB16BB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = TestZeeQL3PCK/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				PRODUCT_BUNDLE_IDENTIFIER = de.zeezide.zeeql.adaptors.pck.TestZeeQL3PCK;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		E894B1422304667E00AB16BB /* Build configuration list for PBXProject "ZeeQL3PCK" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E894B1492304667E00AB16BB /* Debug */,
+				E894B14A2304667E00AB16BB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E894B14B2304667E00AB16BB /* Build configuration list for PBXNativeTarget "ZeeQL3PCK" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E894B14C2304667E00AB16BB /* Debug */,
+				E894B14D2304667E00AB16BB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E894B1752304700D00AB16BB /* Build configuration list for PBXNativeTarget "TestZeeQL3PCK" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E894B1732304700D00AB16BB /* Debug */,
+				E894B1742304700D00AB16BB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		E894B16123046A6200AB16BB /* XCRemoteSwiftPackageReference "PostgresClientKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/codewinsdotcom/PostgresClientKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.3.2;
+			};
+		};
+		E894B16423046A7100AB16BB /* XCRemoteSwiftPackageReference "ZeeQL3" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ZeeQL/ZeeQL3.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.8.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		E894B16223046A6200AB16BB /* PostgresClientKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E894B16123046A6200AB16BB /* XCRemoteSwiftPackageReference "PostgresClientKit" */;
+			productName = PostgresClientKit;
+		};
+		E894B16523046A7100AB16BB /* ZeeQL */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E894B16423046A7100AB16BB /* XCRemoteSwiftPackageReference "ZeeQL3" */;
+			productName = ZeeQL;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = E894B13F2304667E00AB16BB /* Project object */;
+}
