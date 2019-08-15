@@ -6,8 +6,13 @@
 //  Copyright © 2017-2019 ZeeZide GmbH. All rights reserved.
 //
 
-import func   Darwin.atol
-import func   Darwin.atof
+#if os(Linux)
+  import func Glibc.atol
+  import func Glibc.atof
+#else
+  import func Darwin.atol
+  import func Darwin.atof
+#endif
 import struct Foundation.Data
 import ZeeQL
 import PostgresClientKit
