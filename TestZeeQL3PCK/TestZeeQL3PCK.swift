@@ -22,8 +22,23 @@ class TestZeeQL3PCK: XCTestCase {
     XCTAssertNotNil(_adaptor)
     return _adaptor
   }
+  var modelAdaptor : Adaptor! {
+    XCTAssertNotNil(_modelAdaptor)
+    return _modelAdaptor
+  }
+  lazy var database = Database(adaptor: modelAdaptor)
 
   let _adaptor = PostgreSQLAdaptor(database: "dvdrental")
+  
+  lazy var _modelAdaptor: Adaptor = {
+    let adaptor = PostgreSQLAdaptor(database: "dvdrental")
+    let model : Model? = {
+      guard let channel = try? adaptor.openChannel() else { return nil }
+      return try? PostgreSQLModelFetch(channel: channel).fetchModel()
+    }()
+    adaptor.model = model
+    return adaptor
+  }()
 
   func testConnect() throws {
     let channel = try adaptor.openChannel()
@@ -35,9 +50,15 @@ class TestZeeQL3PCK: XCTestCase {
     let adaptor = PostgreSQLAdaptor(database: "dvdrental")
     let channel = try adaptor.openChannel()
     
+    do {
     try channel.select("SELECT actor_id, first_name, last_name FROM actor;") {
       ( id: Int, firstName: String, lastName: String ) in
       print("\(id): \(firstName) \(lastName)")
+    }
+    }
+    catch {
+      print("ERROR:", error)
+      XCTAssertNil(error)
     }
   }
 
@@ -100,5 +121,42 @@ class TestZeeQL3PCK: XCTestCase {
     }
 
     XCTAssertNotNil(model.tag, "model has no tag")
+  }
+
+  func testInventoryAdaptorFetch() throws {
+    let adaptor = modelAdaptor!
+    let entity = adaptor.model![entity: "inventory"]!
+    
+    let sqlAttrs = entity.attributes.map { $0.columnName ?? $0.name }
+                         .joined(separator: ", ")
+    
+    do {
+      let channel = try adaptor.openChannel()
+      try channel.querySQL(
+        "SELECT \(sqlAttrs) FROM \(entity.externalName ?? entity.name) LIMIT 1",
+        entity.attributes
+      ) { record in
+        print("REC:", record)
+      }
+    }
+    catch {
+      print("ERROR:", error)
+      XCTAssertNil(error)
+    }
+  }
+
+  func testInventoryDataSourceFetch() throws {
+    let db = database
+    let ds = ActiveDataSource<ActiveRecord>(
+      database: db, entity: db.model![entity: "inventory"]!)
+    
+    do {
+      let results = try ds.fetchObjects()
+      print("RESULTS: #\(results.count)")
+    }
+    catch {
+      print("ERROR:", error)
+      XCTAssertNil(error)
+    }
   }
 }
