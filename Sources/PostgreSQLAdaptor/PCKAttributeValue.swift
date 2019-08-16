@@ -147,10 +147,18 @@ extension Date: PCKAttributeValue {
     df.timeZone = TimeZone(secondsFromGMT: 0)
     return df
   }()
-  
+  private static var dateHackFormatter2: DateFormatter = {
+    let df = DateFormatter()
+    df.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
+    df.timeZone = TimeZone(secondsFromGMT: 0)
+    return df
+  }()
+
   static func pckValue(_ value: PostgresValue) throws -> Any? {
     try value.zzVerifyNotNil()
-    // We get in the dvdrental db: "2006-02-15 10:09:17"
+    // We get in the dvdrental db:
+    //       "2006-02-15 10:09:17"
+    // also: "2013-05-26 14:47:57.62"
     // But this is actually declared as "timestamp without time zone" (why?)
     /* PCK wants:
         let df = DateFormatter()
@@ -161,9 +169,13 @@ extension Date: PCKAttributeValue {
      */
     
     // temp hack (lolz)
-    if let s = value.rawValue, s.count == 19 { // "2006-02-15 10:09:17"
-      if let d = dateHackFormatter.date(from: s) {
-        return d
+    if let s = value.rawValue {
+      let count = s.count
+      if count == 19, let d = dateHackFormatter.date(from: s) {
+        return d // "2006-02-15 10:09:17"
+      }
+      if count > 20 && count < 24, let d = dateHackFormatter2.date(from: s) {
+        return d // "2006-02-15 10:09:17.62"
       }
     }
     
