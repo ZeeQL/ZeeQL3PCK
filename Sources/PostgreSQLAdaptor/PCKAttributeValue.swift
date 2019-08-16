@@ -137,9 +137,36 @@ extension Decimal: PCKAttributeValue {
   }
 }
 
+import Foundation
+
 extension Date: PCKAttributeValue {
+  
+  private static var dateHackFormatter: DateFormatter = {
+    let df = DateFormatter()
+    df.dateFormat = "yyyy-MM-dd HH:mm:ss"
+    df.timeZone = TimeZone(secondsFromGMT: 0)
+    return df
+  }()
+  
   static func pckValue(_ value: PostgresValue) throws -> Any? {
     try value.zzVerifyNotNil()
+    // We get in the dvdrental db: "2006-02-15 10:09:17"
+    // But this is actually declared as "timestamp without time zone" (why?)
+    /* PCK wants:
+        let df = DateFormatter()
+        df.calendar = Postgres.enUsPosixUtcCalendar
+        df.dateFormat = "yyyy-MM-dd HH:mm:ss.SSSxxxxx"
+        df.locale = Postgres.enUsPosixLocale
+        df.timeZone = Postgres.utcTimeZone
+     */
+    
+    // temp hack (lolz)
+    if let s = value.rawValue, s.count == 19 { // "2006-02-15 10:09:17"
+      if let d = dateHackFormatter.date(from: s) {
+        return d
+      }
+    }
+    
     return try value.timestampWithTimeZone().date
   }
 }
