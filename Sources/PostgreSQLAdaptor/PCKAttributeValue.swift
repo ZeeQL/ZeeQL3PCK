@@ -66,44 +66,44 @@ extension Int: PCKAttributeValue {
 }
 extension Int8: PCKAttributeValue {
   static func pckValue(_ value: PostgresValue) throws -> Any? {
-    return Self(try value.int(ofType: Int8.self))
+    return Int8(try value.int(ofType: Int8.self))
   }
 }
 extension Int16: PCKAttributeValue {
   static func pckValue(_ value: PostgresValue) throws -> Any? {
-    return Self(try value.int(ofType: Int16.self))
+    return Int16(try value.int(ofType: Int16.self))
   }
 }
 extension Int32: PCKAttributeValue {
   static func pckValue(_ value: PostgresValue) throws -> Any? {
-    return Self(try value.int(ofType: Int32.self))
+    return Int32(try value.int(ofType: Int32.self))
   }
 }
 extension Int64: PCKAttributeValue {
   static func pckValue(_ value: PostgresValue) throws -> Any? {
-    return Self(try value.int(ofType: Int64.self))
+    return Int64(try value.int(ofType: Int64.self))
   }
 }
 extension UInt8: PCKAttributeValue {
   static func pckValue(_ value: PostgresValue) throws -> Any? {
-    return Self(try value.int(ofType: UInt8.self))
+    return UInt8(try value.int(ofType: UInt8.self))
   }
 }
 extension UInt16: PCKAttributeValue {
   static func pckValue(_ value: PostgresValue) throws -> Any? {
-    return Self(try value.int(ofType: UInt16.self))
+    return UInt16(try value.int(ofType: UInt16.self))
   }
 }
 extension UInt32: PCKAttributeValue {
   static func pckValue(_ value: PostgresValue) throws -> Any? {
-    return Self(try value.int(ofType: UInt32.self))
+    return UInt32(try value.int(ofType: UInt32.self))
   }
 }
 extension UInt64: PCKAttributeValue {
   static func pckValue(_ value: PostgresValue) throws -> Any? {
     try value.zzVerifyNotNil()
     // FIXME: can break for valid value
-    return Self(try value.int(ofType: UInt64.self))
+    return UInt64(try value.int(ofType: UInt64.self))
   }
 }
 
