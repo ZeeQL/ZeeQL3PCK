@@ -174,8 +174,8 @@ extension Date: PCKAttributeValue {
       if count == 19, let d = dateHackFormatter.date(from: s) {
         return d // "2006-02-15 10:09:17"
       }
-      if count > 20 && count < 24, let d = dateHackFormatter2.date(from: s) {
-        return d // "2006-02-15 10:09:17.62"
+      if count > 20 && count < 29, let d = dateHackFormatter2.date(from: s) {
+        return d // "2006-02-15 10:09:17.62" "2006-05-16 16:13:11.79328"
       }
     }
     
