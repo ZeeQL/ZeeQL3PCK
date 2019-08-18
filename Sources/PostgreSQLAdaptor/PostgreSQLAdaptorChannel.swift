@@ -127,7 +127,7 @@ open class PostgreSQLAdaptorChannel : AdaptorChannel, SmartDescription {
   {
     guard let handle = handle else { throw Error.connectionClosed }
     
-    if logSQL { print("SQL: \(sql)") }
+    globalZeeQLLogger.info("SQL:", sql)
     
     let statement : Statement
     do {
