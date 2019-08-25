@@ -6,7 +6,10 @@
 //  Copyright © 2017-2019 ZeeZide GmbH. All rights reserved.
 //
 
+import Foundation
 import struct Foundation.URL
+import struct Foundation.URLComponents
+import struct Foundation.URLQueryItem
 import ZeeQL
 import PostgresClientKit
 
@@ -92,6 +95,26 @@ open class PostgreSQLAdaptor : Adaptor, SmartDescription {
                       ? .trust : .md5Password(password: password)
     config.ssl        = useSSL
     self.connectionConfiguration = config
+  }
+  
+  public var url: URL? {
+    let cfg    = connectionConfiguration
+    var url    = URLComponents()
+    url.scheme = cfg.ssl ? "postgresqls" : "postgresql"
+    url.port   = cfg.port
+    if !cfg.host.isEmpty { url.host   = cfg.host }
+    if !cfg.user.isEmpty { url.user   = cfg.user }
+    switch cfg.credential {
+      case .trust: break
+      case .md5Password      (let password): url.password = password
+      case .cleartextPassword(let password): url.password = password
+    }
+    if !cfg.database.isEmpty {
+      url.path = "/" +
+        cfg.database
+          .addingPercentEncoding(withAllowedCharacters: .urlPathAllowed)!
+    }
+    return url.url
   }
   
   
