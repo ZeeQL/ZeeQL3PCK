@@ -219,4 +219,20 @@ class TestZeeQL3PCK: XCTestCase {
       XCTAssertNil(error)
     }
   }
+  func testDataDBFetch() throws {
+    let db     = database
+    let entity = db.model![entity: "staff"]!
+    let ds     = ActiveDataSource<ActiveRecord>(database: db, entity: entity)
+    
+    
+    do {
+      let objects = try ds.fetchObjects()
+      print("objects:", objects)
+      XCTAssert(objects.count >= 2)
+    }
+    catch {
+      print("ERROR:", error)
+      XCTAssertNil(error)
+    }
+  }
 }
