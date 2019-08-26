@@ -11,8 +11,10 @@ import struct   Foundation.Decimal
 import struct   Foundation.URL
 import struct   PostgresClientKit.PostgresValue
 import protocol PostgresClientKit.PostgresValueConvertible
+import protocol ZeeQL.Attribute
 import protocol ZeeQL.AttributeValue
 import class    ZeeQL.SingleIntKeyGlobalID
+import let      ZeeQL.globalZeeQLLogger
 
 extension SingleIntKeyGlobalID: PostgresValueConvertible {
   public var postgresValue: PostgresValue { return value.postgresValue }
@@ -20,14 +22,14 @@ extension SingleIntKeyGlobalID: PostgresValueConvertible {
 
 protocol PCKAttributeValue: AttributeValue {
   
-  static func pckValue(_ value: PostgresValue) throws -> Any?
+  static func pckValue(_ value: PostgresValue, _ a: Attribute) throws -> Any?
   
 }
 
 extension Optional: PCKAttributeValue where Wrapped : PCKAttributeValue {
-  static func pckValue(_ value: PostgresValue) throws -> Any? {
+  static func pckValue(_ value: PostgresValue, _ a: Attribute) throws -> Any? {
     if value.isNull { return Optional<Wrapped>.none }
-    return try Wrapped.pckValue(value)
+    return try Wrapped.pckValue(value, a)
   }
 }
 
@@ -38,7 +40,7 @@ fileprivate extension PostgresValue {
 }
 
 extension String: PCKAttributeValue {
-  static func pckValue(_ value: PostgresValue) throws -> Any? {
+  static func pckValue(_ value: PostgresValue, _ a: Attribute) throws -> Any? {
     try value.zzVerifyNotNil()
     return try value.string()
   }
@@ -59,48 +61,48 @@ extension PostgresValue {
 
 
 extension Int: PCKAttributeValue {
-  static func pckValue(_ value: PostgresValue) throws -> Any? {
+  static func pckValue(_ value: PostgresValue, _ a: Attribute) throws -> Any? {
     try value.zzVerifyNotNil()
     return try value.int()
   }
 }
 extension Int8: PCKAttributeValue {
-  static func pckValue(_ value: PostgresValue) throws -> Any? {
+  static func pckValue(_ value: PostgresValue, _ a: Attribute) throws -> Any? {
     return Int8(try value.int(ofType: Int8.self))
   }
 }
 extension Int16: PCKAttributeValue {
-  static func pckValue(_ value: PostgresValue) throws -> Any? {
+  static func pckValue(_ value: PostgresValue, _ a: Attribute) throws -> Any? {
     return Int16(try value.int(ofType: Int16.self))
   }
 }
 extension Int32: PCKAttributeValue {
-  static func pckValue(_ value: PostgresValue) throws -> Any? {
+  static func pckValue(_ value: PostgresValue, _ a: Attribute) throws -> Any? {
     return Int32(try value.int(ofType: Int32.self))
   }
 }
 extension Int64: PCKAttributeValue {
-  static func pckValue(_ value: PostgresValue) throws -> Any? {
+  static func pckValue(_ value: PostgresValue, _ a: Attribute) throws -> Any? {
     return Int64(try value.int(ofType: Int64.self))
   }
 }
 extension UInt8: PCKAttributeValue {
-  static func pckValue(_ value: PostgresValue) throws -> Any? {
+  static func pckValue(_ value: PostgresValue, _ a: Attribute) throws -> Any? {
     return UInt8(try value.int(ofType: UInt8.self))
   }
 }
 extension UInt16: PCKAttributeValue {
-  static func pckValue(_ value: PostgresValue) throws -> Any? {
+  static func pckValue(_ value: PostgresValue, _ a: Attribute) throws -> Any? {
     return UInt16(try value.int(ofType: UInt16.self))
   }
 }
 extension UInt32: PCKAttributeValue {
-  static func pckValue(_ value: PostgresValue) throws -> Any? {
+  static func pckValue(_ value: PostgresValue, _ a: Attribute) throws -> Any? {
     return UInt32(try value.int(ofType: UInt32.self))
   }
 }
 extension UInt64: PCKAttributeValue {
-  static func pckValue(_ value: PostgresValue) throws -> Any? {
+  static func pckValue(_ value: PostgresValue, _ a: Attribute) throws -> Any? {
     try value.zzVerifyNotNil()
     // FIXME: can break for valid value
     return UInt64(try value.int(ofType: UInt64.self))
@@ -108,7 +110,7 @@ extension UInt64: PCKAttributeValue {
 }
 
 extension Float: PCKAttributeValue {
-  static func pckValue(_ value: PostgresValue) throws -> Any? {
+  static func pckValue(_ value: PostgresValue, _ a: Attribute) throws -> Any? {
     try value.zzVerifyNotNil()
     guard let rv = value.rawValue else { return nil }
     guard let v  = Float(rv) else {
@@ -118,20 +120,20 @@ extension Float: PCKAttributeValue {
   }
 }
 extension Double: PCKAttributeValue {
-  static func pckValue(_ value: PostgresValue) throws -> Any? {
+  static func pckValue(_ value: PostgresValue, _ a: Attribute) throws -> Any? {
     try value.zzVerifyNotNil()
     return try value.double()
   }
 }
 extension Bool: PCKAttributeValue {
-  static func pckValue(_ value: PostgresValue) throws -> Any? {
+  static func pckValue(_ value: PostgresValue, _ a: Attribute) throws -> Any? {
     try value.zzVerifyNotNil()
     return try value.bool()
   }
 }
 
 extension Decimal: PCKAttributeValue {
-  static func pckValue(_ value: PostgresValue) throws -> Any? {
+  static func pckValue(_ value: PostgresValue, _ a: Attribute) throws -> Any? {
     try value.zzVerifyNotNil()
     return try value.decimal()
   }
@@ -154,7 +156,7 @@ extension Date: PCKAttributeValue {
     return df
   }()
 
-  static func pckValue(_ value: PostgresValue) throws -> Any? {
+  static func pckValue(_ value: PostgresValue, _ a: Attribute) throws -> Any? {
     try value.zzVerifyNotNil()
     // We get in the dvdrental db:
     //       "2006-02-15 10:09:17"
@@ -182,13 +184,65 @@ extension Date: PCKAttributeValue {
     return try value.timestampWithTimeZone().date
   }
 }
+
 extension URL: PCKAttributeValue {
-  static func pckValue(_ value: PostgresValue) throws -> Any? {
+  static func pckValue(_ value: PostgresValue, _ a: Attribute) throws -> Any? {
     try value.zzVerifyNotNil()
     let s = try value.string()
     guard let v = URL(string: s) else {
       throw PostgreSQLAdaptorChannel.Error.conversionError(URL.self, s)
     }
     return v
+  }
+}
+
+extension Data: PCKAttributeValue {
+  static func pckValue(_ value: PostgresValue, _ a: Attribute) throws -> Any? {
+    try value.zzVerifyNotNil()
+    let s = try value.string()
+    if s.isEmpty { return Data()}
+    
+    if a.externalType == nil || a.externalType == "BYTEA" {
+      // https://www.postgresql.org/docs/9.0/datatype-binary.html
+      // \x89504e470d0a5a0a
+      if s.hasPrefix("E") {
+        globalZeeQLLogger.error("bytea escape format is unsupported", a)
+        assert(!s.hasPrefix("E"), "bytea escape format is unsupported")
+        return nil
+      }
+      
+      if s.hasPrefix("\\x") { // hex
+        // 2 hexadecimal digits per byte, most significant nibble first
+        let sub = s.dropFirst(2)
+        guard sub.count % 2 == 0 else {
+          globalZeeQLLogger.error("invalid hex encoding:", s, a)
+          throw PostgreSQLAdaptorChannel.Error.conversionError(Data.self, s)
+        }
+        
+        // Probably quite slow, but well, one should binary PG encoding ...
+        // https://stackoverflow.com/questions/26501276/converting-hex-string
+        var data = Data(capacity: sub.count / 2)
+        var indexIsEven = true
+        for i in sub.indices {
+          defer { indexIsEven = !indexIsEven }
+          if indexIsEven {
+            let byteRange = i...sub.index(after: i)
+            guard let byte = UInt8(sub[byteRange], radix: 16) else {
+              globalZeeQLLogger.error("invalid hex encoding:", s, a)
+              throw PostgreSQLAdaptorChannel.Error.conversionError(Data.self, s)
+            }
+            data.append(byte)
+          }
+        }
+        return data
+      }
+
+      globalZeeQLLogger.error("unexpected data encoding:", s, a)
+      throw PostgreSQLAdaptorChannel.Error.conversionError(Data.self, s)
+    }
+    else {
+      globalZeeQLLogger.error("unsupported PG data type:", a)
+      throw PostgreSQLAdaptorChannel.Error.conversionError(Data.self, s)
+    }
   }
 }

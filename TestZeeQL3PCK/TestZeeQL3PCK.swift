@@ -181,4 +181,26 @@ class TestZeeQL3PCK: XCTestCase {
       XCTAssertNil(error)
     }
   }
+
+  func testDataAdaptorFetch() throws {
+    let adaptor  = modelAdaptor!
+    let entity   = adaptor.model![entity: "staff"]!
+    let picattr  = entity[attribute: "picture"]!
+    
+    let sqlAttrs = picattr.columnName ?? picattr.name
+    
+    do {
+      let channel = try adaptor.openChannel()
+      try channel.querySQL(
+        "SELECT \(sqlAttrs) FROM \(entity.externalName ?? entity.name) LIMIT 1",
+        entity.attributes
+      ) { record in
+        print("REC:", record)
+      }
+    }
+    catch {
+      print("ERROR:", error)
+      XCTAssertNil(error)
+    }
+  }
 }
