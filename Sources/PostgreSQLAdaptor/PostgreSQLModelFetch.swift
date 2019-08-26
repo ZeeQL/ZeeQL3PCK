@@ -414,6 +414,12 @@ open class PostgreSQLModelFetch: AdaptorModelFetch {
         attribute.valueType =
           ZeeQLTypes.valueTypeForExternalType(exttype,
                                    allowsNull: attribute.allowsNull ?? true)
+        #if DEBUG && false
+          if attribute.valueType == nil {
+            globalZeeQLLogger.warn("no value type for exttype:", exttype,
+                                   attribute.allowsNull ?? true)
+          }
+        #endif
       }
       
       if let ac = autoincrementColumns, ac.contains(colname) {

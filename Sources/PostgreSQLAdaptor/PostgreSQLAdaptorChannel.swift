@@ -102,12 +102,12 @@ open class PostgreSQLAdaptorChannel : AdaptorChannel, SmartDescription {
         let pgValue = row.columns[col]
         
         // PostgresClientKit also lacks value reflection
-        if let attrType = attr?.valueType {
+        if let attr = attr, let attrType = attr.valueType {
           guard let pckType = attrType as? PCKAttributeValue.Type else {
             throw Error.unsupportedValueType(attrType)
           }
 
-          values.append(try pckType.pckValue(pgValue))
+          values.append(try pckType.pckValue(pgValue, attr))
         }
         else {
           values.append(try pgValue.optionalString())
