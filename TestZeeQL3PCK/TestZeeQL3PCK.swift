@@ -181,6 +181,19 @@ class TestZeeQL3PCK: XCTestCase {
       XCTAssertNil(error)
     }
   }
+  
+  func testPicSchemaReflection() throws {
+    guard let adaptor  = modelAdaptor, let model = adaptor.model,
+          let entity   = model[entity: "staff"],
+          let picattr  = entity[attribute: "picture"] else {
+      XCTAssert(false, "missing entity")
+      return
+    }
+    XCTAssertNotNil(picattr.valueType)
+    guard let vt = picattr.valueType else { return }
+    
+    XCTAssertEqual(ObjectIdentifier(vt), ObjectIdentifier(Optional<Data>.self))
+  }
 
   func testDataAdaptorFetch() throws {
     let adaptor  = modelAdaptor!
@@ -188,13 +201,16 @@ class TestZeeQL3PCK: XCTestCase {
     let picattr  = entity[attribute: "picture"]!
     
     let sqlAttrs = picattr.columnName ?? picattr.name
-    
+    XCTAssertEqual(ObjectIdentifier(picattr.valueType!),
+                   ObjectIdentifier(Optional<Data>.self))
+
     do {
       let channel = try adaptor.openChannel()
       try channel.querySQL(
         "SELECT \(sqlAttrs) FROM \(entity.externalName ?? entity.name) LIMIT 1",
-        entity.attributes
-      ) { record in
+        [picattr]
+      )
+      { record in
         print("REC:", record)
       }
     }
