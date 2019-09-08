@@ -144,6 +144,7 @@ open class PostgreSQLAdaptor : Adaptor, SmartDescription {
   // MARK: - Connection pool
   
   private final class SingleConnectionPool {
+    // Naive, single connection pool.
     
     struct Entry {
       let releaseDate : Date
@@ -169,39 +170,54 @@ open class PostgreSQLAdaptor : Adaptor, SmartDescription {
     
     func add(_ channel: AdaptorChannel) {
       lock.lock()
-      if entry == nil {
+      let doAdd = entry == nil
+      if doAdd {
         entry = Entry(releaseDate: Date(), connection: channel)
       }
       lock.unlock()
-
+      
+      if doAdd {
+        globalZeeQLLogger.info("adding connection to pool:", channel)
+      }
+      else {
+        globalZeeQLLogger.info("did not add connection to pool:", channel)
+      }
+      
       expirationQueue.async {
-        if self.gc != nil { return }
+        if self.gc != nil { return } // already running
         self.gc = DispatchWorkItem(block: self.expire)
         self.expirationQueue.asyncAfter(deadline: .now() + .seconds(1),
                                         execute: self.gc!)
       }
     }
-    func expire() {
+    private func expire() {
       let rerun : Bool
-      lock.lock()
-      if let entry = entry {
-        rerun = entry.age > maxAge
-        if !rerun { self.entry = nil }
+      do {
+        lock.lock(); defer { lock.unlock() }
+        if let entry = entry {
+          rerun = entry.age > maxAge
+          if !rerun { self.entry = nil }
+        }
+        else { rerun = false }
       }
-      else { rerun = false }
-      lock.unlock()
-      
+        
       if rerun {
         gc = DispatchWorkItem(block: self.expire)
         expirationQueue.asyncAfter(deadline: .now() + .seconds(1),
                                    execute: gc!)
+      }
+      else {
+        gc = nil
       }
     }
   }
   private var connectionPool = SingleConnectionPool(maxAge: 10)
   
   open func openChannelFromPool() throws -> AdaptorChannel {
-    if let pooled = connectionPool.grab() { return pooled }
+    if let pooled = connectionPool.grab() {
+      globalZeeQLLogger.info("reusing pooled connection:", pooled)
+      return pooled
+    }
     return try openChannel()
   }
   
