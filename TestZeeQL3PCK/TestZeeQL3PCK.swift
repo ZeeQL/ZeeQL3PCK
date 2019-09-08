@@ -153,6 +153,10 @@ class TestZeeQL3PCK: XCTestCase {
     do {
       let results = try ds.fetchObjects()
       print("RESULTS: #\(results.count)")
+
+      // test pool
+      let results2 = try ds.fetchObjects()
+      print("RESULTS: #\(results2.count)")
     }
     catch {
       print("ERROR:", error)

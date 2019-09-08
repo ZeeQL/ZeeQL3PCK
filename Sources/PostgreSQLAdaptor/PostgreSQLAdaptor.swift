@@ -10,6 +10,7 @@ import Foundation
 import struct Foundation.URL
 import struct Foundation.URLComponents
 import struct Foundation.URLQueryItem
+import struct Foundation.Date
 import ZeeQL
 import PostgresClientKit
 
@@ -139,8 +140,100 @@ open class PostgreSQLAdaptor : Adaptor, SmartDescription {
     }
   }
   
-  public func releaseChannel(_ channel: AdaptorChannel) {
-    // not maintaing a pool
+  
+  // MARK: - Connection pool
+  
+  private final class SingleConnectionPool {
+    // Naive, single connection pool.
+    
+    struct Entry {
+      let releaseDate : Date
+      let connection  : AdaptorChannel
+      
+      var age : TimeInterval { return -(releaseDate.timeIntervalSinceNow) }
+    }
+
+    let maxAge          : TimeInterval
+    let lock            = NSLock()
+    let expirationQueue = DispatchQueue(label: "de.zeezide.zeeql.pck.expire")
+    var entry           : Entry? // here we just pool one :-)
+    var gc              : DispatchWorkItem?
+    
+    init(maxAge: TimeInterval) {
+      self.maxAge = maxAge
+    }
+    
+    func grab() -> AdaptorChannel? {
+      lock.lock(); defer { entry = nil; lock.unlock() }
+      return entry?.connection
+    }
+    
+    func add(_ channel: AdaptorChannel) {
+      lock.lock()
+      let doAdd = entry == nil
+      if doAdd {
+        entry = Entry(releaseDate: Date(), connection: channel)
+      }
+      lock.unlock()
+      
+      if doAdd {
+        globalZeeQLLogger.info("adding connection to pool:", channel)
+      }
+      else {
+        globalZeeQLLogger.info("did not add connection to pool:", channel)
+      }
+      
+      expirationQueue.async {
+        if self.gc != nil { return } // already running
+        self.gc = DispatchWorkItem(block: self.expire)
+        self.expirationQueue.asyncAfter(deadline: .now() + .seconds(1),
+                                        execute: self.gc!)
+      }
+    }
+    private func expire() {
+      let rerun : Bool
+      do {
+        lock.lock(); defer { lock.unlock() }
+        if let entry = entry {
+          rerun = entry.age > maxAge
+          if !rerun { self.entry = nil }
+        }
+        else { rerun = false }
+      }
+        
+      if rerun {
+        gc = DispatchWorkItem(block: self.expire)
+        expirationQueue.asyncAfter(deadline: .now() + .seconds(1),
+                                   execute: gc!)
+      }
+      else {
+        gc = nil
+      }
+    }
+  }
+  private var connectionPool = SingleConnectionPool(maxAge: 10)
+  
+  open func openChannelFromPool() throws -> AdaptorChannel {
+    if let pooled = connectionPool.grab() {
+      globalZeeQLLogger.info("reusing pooled connection:", pooled)
+      return pooled
+    }
+    return try openChannel()
+  }
+  
+  open func releaseChannel(_ channel: AdaptorChannel) {
+    guard !channel.isTransactionInProgress else {
+      globalZeeQLLogger.warn("release a channel w/ an option TX:", channel)
+      try? channel.rollback()
+      return
+    }
+    guard let pgChannel = channel as? PostgreSQLAdaptorChannel else {
+      globalZeeQLLogger.warn("attempt to release a foreign channel:", channel)
+      return
+    }
+    guard pgChannel.handle != nil else { return } // closed
+    
+    connectionPool.add(pgChannel)
   }
   
   
