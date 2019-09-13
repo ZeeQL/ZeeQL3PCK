@@ -239,4 +239,31 @@ class TestZeeQL3PCK: XCTestCase {
       XCTAssertNil(error)
     }
   }
+  
+  func testToOneFetch() throws {
+    let db     = database
+    let entity = db.model![entity: "customer"]!
+    let ds     = ActiveDataSource<ActiveRecord>(database: db, entity: entity)
+    
+    let rsname = "customer_address_id_fkey"
+
+    ds.fetchSpecification = ModelFetchSpecification(entity: entity)
+      .limit(1)
+      .prefetch(rsname)
+      .where("customer_id = 524")
+
+    let objects = try ds.fetchObjects()
+    XCTAssert(objects.count == 1)
+    guard let jared = objects.first else { return }
+    
+    guard let relship = jared[rsname] else {
+      XCTAssertNotNil(jared[rsname])
+      return
+    }
+    XCTAssert(relship is ActiveRecord)
+    
+    let phone = KeyValueCoding.value(forKeyPath: rsname + ".phone",
+                                     inObject: jared)
+    XCTAssertEqual(phone as? String, "35533115997")
+  }
 }
