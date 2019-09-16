@@ -27,10 +27,10 @@ extension Date: PostgresValueConvertible {
   }
 }
 extension Float: PostgresValueConvertible {
-  public var postgresValue: PostgresValue { Double(self).postgresValue }
+  public var postgresValue: PostgresValue { return Double(self).postgresValue }
 }
 extension UInt64: PostgresValueConvertible {
-  public var postgresValue: PostgresValue { String(self).postgresValue }
+  public var postgresValue: PostgresValue { return String(self).postgresValue }
 }
 extension NSNumber: PostgresValueConvertible {
   public var postgresValue: PostgresValue {
