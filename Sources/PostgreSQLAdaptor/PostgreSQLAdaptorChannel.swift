@@ -141,8 +141,14 @@ open class PostgreSQLAdaptorChannel : AdaptorChannel, SmartDescription {
     let cursor : Cursor
     do {
       if let bindings = bindings, !bindings.isEmpty {
-        let parameters = bindings.map {
-          $0.value as? PostgresValueConvertible
+        let parameters : [ PostgresValueConvertible? ] = bindings.map {
+          guard let value = $0.value else { return nil }
+          guard let pg = $0.value as? PostgresValueConvertible else {
+            globalZeeQLLogger.warn(
+              "SQL binding contains a value we can't represent:", value)
+            return String(describing: value)
+          }
+          return pg
         }
         cursor = try statement.execute(parameterValues: parameters)
       }

@@ -9,6 +9,7 @@
 import struct   Foundation.Date
 import struct   Foundation.Decimal
 import struct   Foundation.URL
+import struct   PostgresClientKit.PostgresTimestampWithTimeZone
 import struct   PostgresClientKit.PostgresValue
 import protocol PostgresClientKit.PostgresValueConvertible
 import protocol ZeeQL.Attribute
@@ -19,7 +20,16 @@ import let      ZeeQL.globalZeeQLLogger
 extension SingleIntKeyGlobalID: PostgresValueConvertible {
   public var postgresValue: PostgresValue { return value.postgresValue }
 }
+extension Date: PostgresValueConvertible {
+  public var postgresValue: PostgresValue {
+    return PostgresTimestampWithTimeZone(date: self).postgresValue
+  }
+}
 
+/**
+ * Convert a `PostgresValue` from PostgresClientKit to the internal value
+ * `Attribute` would like to have.
+ */
 protocol PCKAttributeValue: AttributeValue {
   
   static func pckValue(_ value: PostgresValue, _ a: Attribute) throws -> Any?
