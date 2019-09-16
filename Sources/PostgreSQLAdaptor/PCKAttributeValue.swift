@@ -9,6 +9,7 @@
 import struct   Foundation.Date
 import struct   Foundation.Decimal
 import struct   Foundation.URL
+import class    Foundation.NSNumber
 import struct   PostgresClientKit.PostgresTimestampWithTimeZone
 import struct   PostgresClientKit.PostgresValue
 import protocol PostgresClientKit.PostgresValueConvertible
@@ -23,6 +24,26 @@ extension SingleIntKeyGlobalID: PostgresValueConvertible {
 extension Date: PostgresValueConvertible {
   public var postgresValue: PostgresValue {
     return PostgresTimestampWithTimeZone(date: self).postgresValue
+  }
+}
+extension Float: PostgresValueConvertible {
+  public var postgresValue: PostgresValue { return Double(self).postgresValue }
+}
+extension UInt64: PostgresValueConvertible {
+  public var postgresValue: PostgresValue { return String(self).postgresValue }
+}
+extension NSNumber: PostgresValueConvertible {
+  public var postgresValue: PostgresValue {
+    let ctDouble : Int8 = 100 // "d"
+    let ctFloat  : Int8 = 102 // "f"
+    let ctUInt64 : Int8 = 81  // "Q"
+    switch objCType.pointee {
+      // 99 is "c" which is also used as bool
+      case ctDouble : return doubleValue.postgresValue
+      case ctFloat  : return floatValue .postgresValue
+      case ctUInt64 : return uint64Value.postgresValue
+      default       : return intValue   .postgresValue
+    }
   }
 }
 
