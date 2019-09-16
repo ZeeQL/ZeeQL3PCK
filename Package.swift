@@ -11,7 +11,7 @@ let package = Package(
   dependencies: [
     .package(url: "https://github.com/codewinsdotcom/PostgresClientKit", 
              from: "0.3.2"),
-    .package(url: "https://github.com/ZeeQL/ZeeQL3.git", from: "0.8.0")
+    .package(url: "https://github.com/ZeeQL/ZeeQL3.git", from: "0.8.16")
   ],
   targets: [
     .target(name: "PostgreSQLAdaptor", 

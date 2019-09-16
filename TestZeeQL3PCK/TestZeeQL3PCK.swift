@@ -239,4 +239,64 @@ class TestZeeQL3PCK: XCTestCase {
       XCTAssertNil(error)
     }
   }
+  
+  func testToOneFetch() throws {
+    let db     = database
+    let entity = db.model![entity: "customer"]!
+    let ds     = ActiveDataSource<ActiveRecord>(database: db, entity: entity)
+    
+    let rsname = "customer_address_id_fkey"
+
+    ds.fetchSpecification = ModelFetchSpecification(entity: entity)
+      .limit(1)
+      .prefetch(rsname)
+      .where("customer_id = 524")
+
+    let objects = try ds.fetchObjects()
+    XCTAssert(objects.count == 1)
+    guard let jared = objects.first else { return }
+    
+    guard let relship = jared[rsname] else {
+      XCTAssertNotNil(jared[rsname])
+      return
+    }
+    XCTAssert(relship is ActiveRecord)
+    
+    let phone = KeyValueCoding.value(forKeyPath: rsname + ".phone",
+                                     inObject: jared)
+    XCTAssertEqual(phone as? String, "35533115997")
+  }
+  
+  func testNestedToOneFetch() throws {
+    let db     = database
+    let entity = db.model![entity: "rental"]!
+    let ds     = ActiveDataSource<ActiveRecord>(database: db, entity: entity)
+    
+    let rsname   = "rental_inventory_id_fkey"
+    let rsnameL2 = "inventory_film_id_fkey" // to: film 1:1
+    print("entity:", entity.relationships.map { $0.name })
+
+    ds.fetchSpecification = ModelFetchSpecification(entity: entity)
+      .limit(1)
+      .prefetch(rsname + "." + rsnameL2)
+      .where("rental_id = 1")
+
+    let objects = try ds.fetchObjects()
+    XCTAssert(objects.count == 1)
+    guard let topLevel = objects.first else { return }
+    
+    guard let relship = topLevel[rsname] else {
+      XCTAssertNotNil(topLevel[rsname]); return
+    }
+    XCTAssert(relship is ActiveRecord)
+    guard let inventory = relship as? ActiveRecord else { return }
+    
+    guard let relship2 = inventory[rsnameL2] else {
+      XCTAssertNotNil(inventory[rsnameL2]); return
+    }
+    XCTAssert(relship2 is ActiveRecord)
+    guard let film = relship2 as? ActiveRecord else { return }
+
+    print("relship:", film)
+  }
 }
