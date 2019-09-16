@@ -13,6 +13,8 @@ matrix:
           sudo: required
         - os:   osx
           osx_image: xcode10.2
+	- os:   osx
+	  osx_image: xcode11
 
 before_install:
     - ./.travis.d/before-install.sh
