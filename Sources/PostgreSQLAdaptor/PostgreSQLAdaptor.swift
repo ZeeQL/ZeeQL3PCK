@@ -109,6 +109,7 @@ open class PostgreSQLAdaptor : Adaptor, SmartDescription {
       case .trust: break
       case .md5Password      (let password): url.password = password
       case .cleartextPassword(let password): url.password = password
+      case .scramSHA256      (let password): url.password = password
     }
     if !cfg.database.isEmpty {
       url.path = "/" +
