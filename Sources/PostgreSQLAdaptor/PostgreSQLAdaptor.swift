@@ -3,7 +3,7 @@
 //  ZeeQL
 //
 //  Created by Helge Hess on 03/03/17.
-//  Copyright © 2017-2019 ZeeZide GmbH. All rights reserved.
+//  Copyright © 2017-2021 ZeeZide GmbH. All rights reserved.
 //
 
 import Foundation
@@ -15,8 +15,6 @@ import ZeeQL
 import PostgresClientKit
 
 open class PostgreSQLAdaptor : Adaptor, SmartDescription {
-  // TODO: Pool. We really need one for PG. (well, not for ApacheExpress which
-  //       should use mod_dbd)
   
   public enum Error : Swift.Error {
     case Generic
@@ -53,7 +51,9 @@ open class PostgreSQLAdaptor : Adaptor, SmartDescription {
    * Note: The init doesn't validate the connect string, if it is malformed,
    *       channel creation will fail.
    */
-  public convenience init(_ connectString: String) {
+  public convenience init(_ connectString : String,
+                          pool            : AdaptorChannelPool? = nil)
+  {
     if let url = URL(string: connectString) {
       let db : String? = {
         guard !url.path.isEmpty else { return nil }
@@ -78,14 +78,15 @@ open class PostgreSQLAdaptor : Adaptor, SmartDescription {
    * Configure the adaptor with the given values.
    *
    * Example:
-   *
+   * 
    *     let adaptor = PostgreSQLAdaptor(database: "OGo", 
    *                                     user: "OGo", password: "OGo")
    */
-  public init(host: String? = nil, port: Int? = nil,
-              database: String? = nil,
-              user: String? = nil, password: String = "",
-              useSSL: Bool = false)
+  public init(host     : String? = nil, port     : Int?   = nil,
+              database : String? = nil,
+              user     : String? = nil, password : String = "",
+              useSSL   : Bool    = false,
+              pool     : AdaptorChannelPool? = nil)
   {
     var config = ConnectionConfiguration()
     config.host       = host     ?? "127.0.0.1"
@@ -96,6 +97,7 @@ open class PostgreSQLAdaptor : Adaptor, SmartDescription {
                       ? .trust : .md5Password(password: password)
     config.ssl        = useSSL
     self.connectionConfiguration = config
+    if let pool = pool { self.connectionPool = pool }
   }
   
   public var url: URL? {
@@ -109,6 +111,7 @@ open class PostgreSQLAdaptor : Adaptor, SmartDescription {
       case .trust: break
       case .md5Password      (let password): url.password = password
       case .cleartextPassword(let password): url.password = password
+      case .scramSHA256      (let password): url.password = password
     }
     if !cfg.database.isEmpty {
       url.path = "/" +
@@ -143,75 +146,8 @@ open class PostgreSQLAdaptor : Adaptor, SmartDescription {
   
   // MARK: - Connection pool
   
-  private final class SingleConnectionPool {
-    // Naive, single connection pool.
-    
-    struct Entry {
-      let releaseDate : Date
-      let connection  : AdaptorChannel
-      
-      var age : TimeInterval { return -(releaseDate.timeIntervalSinceNow) }
-    }
-
-    let maxAge          : TimeInterval
-    let lock            = NSLock()
-    let expirationQueue = DispatchQueue(label: "de.zeezide.zeeql.pck.expire")
-    var entry           : Entry? // here we just pool one :-)
-    var gc              : DispatchWorkItem?
-    
-    init(maxAge: TimeInterval) {
-      self.maxAge = maxAge
-    }
-    
-    func grab() -> AdaptorChannel? {
-      lock.lock(); defer { entry = nil; lock.unlock() }
-      return entry?.connection
-    }
-    
-    func add(_ channel: AdaptorChannel) {
-      lock.lock()
-      let doAdd = entry == nil
-      if doAdd {
-        entry = Entry(releaseDate: Date(), connection: channel)
-      }
-      lock.unlock()
-      
-      if doAdd {
-        globalZeeQLLogger.info("adding connection to pool:", channel)
-      }
-      else {
-        globalZeeQLLogger.info("did not add connection to pool:", channel)
-      }
-      
-      expirationQueue.async {
-        if self.gc != nil { return } // already running
-        self.gc = DispatchWorkItem(block: self.expire)
-        self.expirationQueue.asyncAfter(deadline: .now() + .seconds(1),
-                                        execute: self.gc!)
-      }
-    }
-    private func expire() {
-      let rerun : Bool
-      do {
-        lock.lock(); defer { lock.unlock() }
-        if let entry = entry {
-          rerun = entry.age > maxAge
-          if !rerun { self.entry = nil }
-        }
-        else { rerun = false }
-      }
-        
-      if rerun {
-        gc = DispatchWorkItem(block: self.expire)
-        expirationQueue.asyncAfter(deadline: .now() + .seconds(1),
-                                   execute: gc!)
-      }
-      else {
-        gc = nil
-      }
-    }
-  }
-  private var connectionPool = SingleConnectionPool(maxAge: 10)
+  private var connectionPool : AdaptorChannelPool
+                             = SingleConnectionPool(maxAge: 10)
   
   open func openChannelFromPool() throws -> AdaptorChannel {
     if let pooled = connectionPool.grab() {
@@ -222,11 +158,6 @@ open class PostgreSQLAdaptor : Adaptor, SmartDescription {
   }
   
   open func releaseChannel(_ channel: AdaptorChannel) {
-    guard !channel.isTransactionInProgress else {
-      globalZeeQLLogger.warn("release a channel w/ an option TX:", channel)
-      try? channel.rollback()
-      return
-    }
     guard let pgChannel = channel as? PostgreSQLAdaptorChannel else {
       globalZeeQLLogger.warn("attempt to release a foreign channel:", channel)
       return

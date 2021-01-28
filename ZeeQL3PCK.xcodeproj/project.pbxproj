@@ -31,6 +31,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		E821409E232BFB2600B86426 /* ZeeQL3 */ = {isa = PBXFileReference; lastKnownFileType = folder; name = ZeeQL3; path = ../ZeeQL3; sourceTree = "<group>"; };
 		E894B1472304667E00AB16BB /* libZeeQL3PCK.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libZeeQL3PCK.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		E894B1502304684F00AB16BB /* PostgreSQLModelFetch.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostgreSQLModelFetch.swift; sourceTree = "<group>"; };
 		E894B1512304684F00AB16BB /* PostgreSQLExpression.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostgreSQLExpression.swift; sourceTree = "<group>"; };
@@ -73,6 +74,7 @@
 			isa = PBXGroup;
 			children = (
 				E894B15D230468F400AB16BB /* Package.swift */,
+				E821409E232BFB2600B86426 /* ZeeQL3 */,
 				E894B14E2304684F00AB16BB /* Sources */,
 				E894B15A2304687200AB16BB /* xcconfig */,
 				E894B16C2304700D00AB16BB /* TestZeeQL3PCK */,
@@ -196,7 +198,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1100;
-				LastUpgradeCheck = 1100;
+				LastUpgradeCheck = 1240;
 				ORGANIZATIONNAME = "Helge Heß";
 				TargetAttributes = {
 					E894B1462304667E00AB16BB = {
@@ -482,7 +484,7 @@
 			repositoryURL = "https://github.com/codewinsdotcom/PostgresClientKit";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 0.3.2;
+				minimumVersion = 1.3.1;
 			};
 		};
 		E894B16423046A7100AB16BB /* XCRemoteSwiftPackageReference "ZeeQL3" */ = {
@@ -490,7 +492,7 @@
 			repositoryURL = "https://github.com/ZeeQL/ZeeQL3.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 0.8.0;
+				minimumVersion = 0.9.3;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
