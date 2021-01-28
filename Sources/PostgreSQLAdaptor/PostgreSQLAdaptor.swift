@@ -3,7 +3,7 @@
 //  ZeeQL
 //
 //  Created by Helge Hess on 03/03/17.
-//  Copyright © 2017-2020 ZeeZide GmbH. All rights reserved.
+//  Copyright © 2017-2021 ZeeZide GmbH. All rights reserved.
 //
 
 import Foundation
@@ -15,8 +15,6 @@ import ZeeQL
 import PostgresClientKit
 
 open class PostgreSQLAdaptor : Adaptor, SmartDescription {
-  // TODO: Pool. We really need one for PG. (well, not for ApacheExpress which
-  //       should use mod_dbd)
   
   public enum Error : Swift.Error {
     case Generic
@@ -53,7 +51,9 @@ open class PostgreSQLAdaptor : Adaptor, SmartDescription {
    * Note: The init doesn't validate the connect string, if it is malformed,
    *       channel creation will fail.
    */
-  public convenience init(_ connectString: String) {
+  public convenience init(_ connectString : String,
+                          pool            : AdaptorChannelPool? = nil)
+  {
     if let url = URL(string: connectString) {
       let db : String? = {
         guard !url.path.isEmpty else { return nil }
@@ -78,14 +78,15 @@ open class PostgreSQLAdaptor : Adaptor, SmartDescription {
    * Configure the adaptor with the given values.
    *
    * Example:
-   *
+   * 
    *     let adaptor = PostgreSQLAdaptor(database: "OGo", 
    *                                     user: "OGo", password: "OGo")
    */
-  public init(host: String? = nil, port: Int? = nil,
-              database: String? = nil,
-              user: String? = nil, password: String = "",
-              useSSL: Bool = false)
+  public init(host     : String? = nil, port     : Int?   = nil,
+              database : String? = nil,
+              user     : String? = nil, password : String = "",
+              useSSL   : Bool    = false,
+              pool     : AdaptorChannelPool? = nil)
   {
     var config = ConnectionConfiguration()
     config.host       = host     ?? "127.0.0.1"
@@ -96,6 +97,7 @@ open class PostgreSQLAdaptor : Adaptor, SmartDescription {
                       ? .trust : .md5Password(password: password)
     config.ssl        = useSSL
     self.connectionConfiguration = config
+    if let pool = pool { self.connectionPool = pool }
   }
   
   public var url: URL? {
@@ -143,8 +145,6 @@ open class PostgreSQLAdaptor : Adaptor, SmartDescription {
   
   
   // MARK: - Connection pool
-  
-  // Note: SingleConnectionPool now lives in ZeeQL
   
   private var connectionPool : AdaptorChannelPool
                              = SingleConnectionPool(maxAge: 10)
