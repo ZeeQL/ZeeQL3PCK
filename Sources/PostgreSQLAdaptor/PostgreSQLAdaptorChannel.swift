@@ -3,7 +3,7 @@
 //  ZeeQL
 //
 //  Created by Helge Hess on 03/03/17.
-//  Copyright © 2017-2019 ZeeZide GmbH. All rights reserved.
+//  Copyright © 2017-2024 ZeeZide GmbH. All rights reserved.
 //
 
 #if os(Linux)
@@ -252,12 +252,10 @@ open class PostgreSQLAdaptorChannel : AdaptorChannel, SmartDescription {
   
   // MARK: - Insert w/ auto-increment support
   
-  open func insertRow(_ row: AdaptorRow, _ entity: Entity?, refetchAll: Bool)
+  open func insertRow(_ row: AdaptorRow, _ entity: Entity, refetchAll: Bool)
               throws -> AdaptorRow
   {
     let attributes : [ Attribute ]? = {
-      guard let entity = entity else { return nil }
-      
       if refetchAll { return entity.attributes }
       
       // TBD: refetch-all if no pkeys are assigned
