@@ -3,7 +3,7 @@
 //  ZeeQL3PCK
 //
 //  Created by Helge Heß on 15.08.19.
-//  Copyright © 2019 Helge Heß. All rights reserved.
+//  Copyright © 2019-2024 Helge Heß. All rights reserved.
 //
 
 import struct   Foundation.Date
@@ -15,20 +15,85 @@ import struct   PostgresClientKit.PostgresValue
 import protocol PostgresClientKit.PostgresValueConvertible
 import protocol ZeeQL.Attribute
 import protocol ZeeQL.AttributeValue
+import struct   ZeeQL.KeyGlobalID
 import let      ZeeQL.globalZeeQLLogger
 
-extension Date: PostgresValueConvertible {
+#if compiler(>=6)
+extension KeyGlobalID : @retroactive PostgresValueConvertible {}
+extension Date        : @retroactive PostgresValueConvertible {}
+extension Float       : @retroactive PostgresValueConvertible {}
+extension Int32       : @retroactive PostgresValueConvertible {}
+extension Int64       : @retroactive PostgresValueConvertible {}
+extension UInt64      : @retroactive PostgresValueConvertible {}
+extension NSNumber    : @retroactive PostgresValueConvertible {}
+extension UUID        : @retroactive PostgresValueConvertible {}
+extension URL         : @retroactive PostgresValueConvertible {}
+#else
+extension KeyGlobalID : PostgresValueConvertible {}
+extension Date        : PostgresValueConvertible {}
+extension Float       : PostgresValueConvertible {}
+extension Int32       : PostgresValueConvertible {}
+extension Int64       : PostgresValueConvertible {}
+extension UInt64      : PostgresValueConvertible {}
+extension NSNumber    : PostgresValueConvertible {}
+extension UUID        : PostgresValueConvertible {}
+extension URL         : PostgresValueConvertible {}
+#endif
+
+extension KeyGlobalID {
+
+  @inlinable
+  public var postgresValue: PostgresValue {
+    switch value {
+      case .int   (let value) : return value.postgresValue
+      case .string(let value) : return value.postgresValue
+      case .uuid  (let value) : return value.postgresValue
+      case .singleNil         : return Optional<Int>.none.postgresValue // Hm.
+      case .values(let values):
+        fatalError("Multikey values not supported \(values)")
+    }
+  }
+}
+
+extension Date {
+
+  @inlinable
   public var postgresValue: PostgresValue {
     return PostgresTimestampWithTimeZone(date: self).postgresValue
   }
 }
-extension Float: PostgresValueConvertible {
+
+extension Float {
+
+  @inlinable
   public var postgresValue: PostgresValue { return Double(self).postgresValue }
 }
-extension UInt64: PostgresValueConvertible {
+
+extension BinaryInteger {
+
+  @inlinable
   public var postgresValue: PostgresValue { return String(self).postgresValue }
 }
-extension NSNumber: PostgresValueConvertible {
+
+extension UUID {
+
+  @inlinable
+  public var postgresValue: PostgresValue {
+    return self.uuidString.postgresValue
+  }
+}
+
+extension URL {
+
+  @inlinable
+  public var postgresValue: PostgresValue {
+    return self.absoluteString.postgresValue
+  }
+}
+
+extension NSNumber {
+
+  @inlinable
   public var postgresValue: PostgresValue {
     let ctDouble : Int8 = 100 // "d"
     let ctFloat  : Int8 = 102 // "f"

@@ -1,6 +1,7 @@
 import Foundation
 import XCTest
 import ZeeQL
+import PostgresClientKit
 @testable import PostgreSQLAdaptor
 
 final class PostgreSQLCompatibilityTests: XCTestCase {
@@ -29,6 +30,36 @@ final class PostgreSQLCompatibilityTests: XCTestCase {
     XCTAssertEqual(try text.string(), "value")
     XCTAssertTrue(try PostgreSQLAdaptorChannel.parameterValue(true).bool())
     XCTAssertTrue(try PostgreSQLAdaptorChannel.parameterValue(nil).isNull)
+  }
+
+  func testImportedScalarConformances() throws {
+    let uuid = UUID()
+    let url = try XCTUnwrap(URL(string: "https://example.test/path?q=1"))
+    let values : [ ( PostgresValueConvertible, String ) ] = [
+      ( Int32.min, "-2147483648" ),
+      ( Int64.max, "9223372036854775807" ),
+      ( UInt64.max, "18446744073709551615" ),
+      ( uuid, uuid.uuidString ),
+      ( url, url.absoluteString )
+    ]
+    for ( value, expected ) in values {
+      XCTAssertEqual(value.postgresValue.rawValue, expected)
+      let parameter = try PostgreSQLAdaptorChannel.parameterValue(value)
+      XCTAssertEqual(parameter.rawValue, expected)
+    }
+  }
+
+  func testScalarGlobalIDConformance() {
+    let uuid = UUID()
+    let values : [ ( PostgresValueConvertible, String? ) ] = [
+      ( KeyGlobalID(entityName: "Object", value: 42), "42" ),
+      ( KeyGlobalID(entityName: "Object", value: "abc"), "abc" ),
+      ( KeyGlobalID(entityName: "Object", value: uuid), uuid.uuidString ),
+      ( KeyGlobalID(entityName: "Object", values: [ nil ]), nil )
+    ]
+    for ( value, expected ) in values {
+      XCTAssertEqual(value.postgresValue.rawValue, expected)
+    }
   }
 
   func testIntegerGlobalID() throws {
