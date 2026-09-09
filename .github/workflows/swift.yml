@@ -13,8 +13,8 @@ jobs:
       fail-fast: false
       matrix:
         image:
-          - swift:5.3.2-xenial
-          - swift:5.3.2-bionic
+          - swift:5.9.2-focal
+          - swift:6.2-noble
     container: ${{ matrix.image }}
     steps:
       - name: Install SQLite
@@ -27,16 +27,30 @@ jobs:
         run: swift build -c debug
       - name: Build Swift Release Package
         run: swift build -c release
+      - name: Run Swift Release Tests
+        run: swift test -c release
   nextstep:
     runs-on: macos-latest
     steps:
       - name: Select latest available Xcode
         uses: maxim-lobanov/setup-xcode@v1.2.1
         with:
-          xcode-version: 12.2
+          xcode-version: latest-stable
       - name: Checkout Repository
         uses: actions/checkout@v2
       - name: Build Swift Debug Package
         run: swift build -c debug
       - name: Build Swift Release Package
         run: swift build -c release
+      - name: Run Swift Release Tests
+        run: swift test -c release
+      - name: Build Xcode Debug Project
+        run: >-
+          xcodebuild -project ZeeQL3PCK.xcodeproj -scheme ZeeQL3PCK
+          -configuration Debug -destination 'generic/platform=macOS'
+          CODE_SIGNING_ALLOWED=NO build
+      - name: Build Xcode Release Project
+        run: >-
+          xcodebuild -project ZeeQL3PCK.xcodeproj -scheme ZeeQL3PCK
+          -configuration Release -destination 'generic/platform=macOS'
+          CODE_SIGNING_ALLOWED=NO build
