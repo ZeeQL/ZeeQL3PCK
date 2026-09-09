@@ -139,7 +139,7 @@ open class PostgreSQLAdaptor : Adaptor, SmartDescription {
       return PostgreSQLAdaptorChannel(adaptor: self, handle: handle)
     }
     catch {
-      throw AdaptorError.CouldNotOpenChannel(Error.Wrapped(error))
+      throw AdaptorError.couldNotOpenChannel(Error.Wrapped(error))
     }
   }
   

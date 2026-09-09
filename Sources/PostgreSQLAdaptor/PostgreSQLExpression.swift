@@ -27,10 +27,10 @@ open class PostgreSQLExpression: SQLExpression {
                                             value: Any?)
                      -> BindVariable
   {
-    var bind = super.bindVariableDictionary(for: attribute, value: value)
+    let bind = super.bindVariableDictionary(for: attribute, value: value)
     bindCounter += 1
-    bind.placeholder = "$\(bindCounter)"
-    return bind
+    return .init(attribute: bind.attribute, placeholder: "$\(bindCounter)",
+                 name: bind.name, value: bind.value)
   }
 
   override open var sqlStringForCaseInsensitiveLike : String? {

@@ -8,7 +8,7 @@
 
 import XCTest
 import ZeeQL
-@testable import ZeeQL3PCK
+import ZeeQL3PCK
 
 class TestZeeQL3PCK: XCTestCase {
   // Assumes that the `dvdrental` database is configured:
@@ -262,8 +262,8 @@ class TestZeeQL3PCK: XCTestCase {
     }
     XCTAssert(relship is ActiveRecord)
     
-    let phone = KeyValueCoding.value(forKeyPath: rsname + ".phone",
-                                     inObject: jared)
+    let phone = KeyValueCoding.valueForKeyPath(rsname + ".phone",
+                                              inObject: jared)
     XCTAssertEqual(phone as? String, "35533115997")
   }
   

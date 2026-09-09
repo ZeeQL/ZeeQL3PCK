@@ -15,12 +15,8 @@ import struct   PostgresClientKit.PostgresValue
 import protocol PostgresClientKit.PostgresValueConvertible
 import protocol ZeeQL.Attribute
 import protocol ZeeQL.AttributeValue
-import class    ZeeQL.SingleIntKeyGlobalID
 import let      ZeeQL.globalZeeQLLogger
 
-extension SingleIntKeyGlobalID: PostgresValueConvertible {
-  public var postgresValue: PostgresValue { return value.postgresValue }
-}
 extension Date: PostgresValueConvertible {
   public var postgresValue: PostgresValue {
     return PostgresTimestampWithTimeZone(date: self).postgresValue

@@ -14,6 +14,7 @@
   import func Darwin.atof
 #endif
 import struct Foundation.Data
+import struct Foundation.UUID
 import ZeeQL
 import PostgresClientKit
 
@@ -21,6 +22,7 @@ import PostgresClientKit
 open class PostgreSQLAdaptorChannel : AdaptorChannel, SmartDescription {
 
   public enum Error : Swift.Error {
+
     case prepare(Swift.Error, sql: String)
     case execute(Swift.Error, sql: String)
     case missingResultSchema
@@ -28,6 +30,7 @@ open class PostgreSQLAdaptorChannel : AdaptorChannel, SmartDescription {
     case conversionError(Any.Type, Any)
     case connectionClosed
     case unexpectedNull
+    case invalidGlobalID(KeyGlobalID)
   }
 
   public let expressionFactory : SQLExpressionFactory
@@ -141,13 +144,8 @@ open class PostgreSQLAdaptorChannel : AdaptorChannel, SmartDescription {
     let cursor : Cursor
     do {
       if let bindings = bindings, !bindings.isEmpty {
-        let parameters : [ PostgresValueConvertible? ] = bindings.map {
-          guard let value = $0.value else { return nil }
-          if let pg = $0.value as? PostgresValueConvertible { return pg }
-          
-          globalZeeQLLogger.warn(
-            "SQL binding contains a value we can't represent:", value)
-          return String(describing: value)
+        let parameters : [ PostgresValueConvertible? ] = try bindings.map {
+          try Self.parameterValue($0.value)
         }
         cursor = try statement.execute(parameterValues: parameters)
       }
@@ -163,6 +161,25 @@ open class PostgreSQLAdaptorChannel : AdaptorChannel, SmartDescription {
     try fetchRows(cursor, optAttrs, cb: cb)
     
     return cursor.rowCount
+  }
+
+  static func parameterValue(_ value: Any?) throws -> PostgresValue {
+    guard let value else { return PostgresValue(nil) }
+    if let globalID = value as? KeyGlobalID {
+      guard globalID.keyCount == 1 else {
+        throw Error.invalidGlobalID(globalID)
+      }
+      // Unwrap AnyHashable-backed keys before checking PCK conversion.
+      let key = globalID[0]
+      return try parameterValue((key as? AnyHashable)?.base ?? key)
+    }
+    if let value = value as? UUID { return value.uuidString.postgresValue }
+    if let value = value as? PostgresValueConvertible {
+      return value.postgresValue
+    }
+    globalZeeQLLogger.warn(
+      "SQL binding contains a value we can't represent:", value)
+    return String(describing: value).postgresValue
   }
   
   public func querySQL(_ sql: String, _ optAttrs : [ Attribute ]?,
@@ -201,8 +218,9 @@ open class PostgreSQLAdaptorChannel : AdaptorChannel, SmartDescription {
   
   public func begin() throws {
     guard let handle = handle else { throw Error.connectionClosed }
-    guard !isTransactionInProgress
-     else { throw AdaptorChannelError.TransactionInProgress }
+    guard !isTransactionInProgress else {
+      throw AdaptorChannelError.transactionInProgress
+    }
     
     try handle.beginTransaction()
     isTransactionInProgress = true
@@ -252,12 +270,10 @@ open class PostgreSQLAdaptorChannel : AdaptorChannel, SmartDescription {
   
   // MARK: - Insert w/ auto-increment support
   
-  open func insertRow(_ row: AdaptorRow, _ entity: Entity?, refetchAll: Bool)
+  open func insertRow(_ row: AdaptorRow, _ entity: Entity, refetchAll: Bool)
               throws -> AdaptorRow
   {
     let attributes : [ Attribute ]? = {
-      guard let entity = entity else { return nil }
-      
       if refetchAll { return entity.attributes }
       
       // TBD: refetch-all if no pkeys are assigned
@@ -273,13 +289,12 @@ open class PostgreSQLAdaptorChannel : AdaptorChannel, SmartDescription {
     var rec : AdaptorRecord? = nil
     try evaluateQueryExpression(expr, attributes) { record in
       guard rec == nil else { // multiple matched!
-        throw AdaptorError.FailedToRefetchInsertedRow(
-                             entity: entity, row: row)
+        throw AdaptorError.failedToRefetchInsertedRow(entity: entity, row: row)
       }
       rec = record
     }
     guard let rrec = rec else { // no record returned?
-      throw AdaptorError.FailedToRefetchInsertedRow(entity: entity, row: row)
+      throw AdaptorError.failedToRefetchInsertedRow(entity: entity, row: row)
     }
     
     return rrec.asAdaptorRow
